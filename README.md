@@ -4,6 +4,8 @@
 WARNING  WARNING  |  WORK IN PROGRESS - DO NOT USE  |  WARNING  WARNING
 #######################################################################
 ```
+At this point I'm laying out my thoughts on communication, interfaces and storage.  I'm also planning on dockerizing the server itself, so that will make it easier for others to use in production.  The real debate is using iojs's container (700mb with build tools, or try Alpine-Linux base which should come in under 200mb, with the necessary build tools)
+
 
 # Ticket Server
 
@@ -16,11 +18,10 @@ The interface provided is a ZeroMQ REQ/RES interface.  Messages are encoded as J
 
 When running newer clustered databases you will generally rely on larger unique values for record ids.  While this allows for wide clusters and high availability, the down side is that the display and usage of these identifiers are in some cases cumbersome to deal with.
 
-Generally speaking, you want smaller, easier to remember say or telephone numbers to use.  You usually don't care if some numbers are skipped, or that the numbers aren't quite issued in order, only that they are relatively close together, and that they aren't repeated. You also want to be able to continue operating in case of a service failure.
+Generally speaking you want smaller, easier to remember, say or telephone numbers to use.  You usually don't care if some numbers are skipped, or that the numbers aren't quite issued in order, only that they are relatively close together, and that they aren't repeated. You also want to be able to continue operating in case of a service failure.
 
-With this in mind, the `ticket-server` servers are meant to run 2-3 instances (though you can run more) each issuing only its' own Nth number on request.  With a drift parameter (default 100) and each request sending the last known/received value, this allows for servers to skip in order to catch up once that drift limit is exceeded.  With two servers in use (`ticket-server --instance 1 --instances 2` and `--instance 2 --instances 2`) you can have one server dealing ODD numbers, while the other deals EVEN numbers.  This allows you to keep relatively short document numbers in use where needed.
+With this in mind, the `ticket-server` servers are meant to run 2-3 instances (though you can run more) each issuing only its' own Nth number on request.  With a drift parameter (default 100) and each request sending the last known/received value, this allows for servers to skip in order to catch up once that drift limit is exceeded.  With two servers in use (`ticket-server --instance 1 --instances 2` and `ticket-server --instance 2 --instances 2`) you will have one server instance dealing ODD numbers, while the other deals EVEN numbers.  This allows you to keep relatively short document numbers in use where needed, and maintain availability in case one server goes down.
 
-This does not mean you should give up on using UUIDs, it only means that in those cases where you absolutely want to keep numbers in use, you can do so easily.
 
 
 ### Warnings
