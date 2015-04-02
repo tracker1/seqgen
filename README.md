@@ -26,10 +26,11 @@ With this in mind, the `ticket-server` servers are meant to run 2-3 instances (t
 
 ### Warnings
 
-* It's best to limit your server instances to 2 or 3 at most.
+* It's best to limit your server instances to 2 or 3 at most per data-center.
   * Use proxy instances to better distribute load/connections 
   * proxies do not forward administrative requests, or jumps in last-value
     * this provides a slightly better security/isolation model 
+  * if you plan to run multiple data centers, give yourself some room to grow with the `--instances` flag. 
 * Numbers are not guaranteed to be issued in sequential order between servers.
   * When running multiple instances for high availability each instance will only deliver the offset of instances as values.  For two nodes, one will return ODD numbers, the other will return EVEN.  Variance will happen.
 * All numbers are not guaranteed to be issued
@@ -109,7 +110,8 @@ A server instance can set the following command line arguments.
   * positive integer value
   * defaults to 1
 * --drift - the offset ids allowed before skipping to catch up
-  * defaults to 100  
+  * defaults to `10 * instances`
+  * setting to 0 or -1 will disable drift skipping
 * --data - the directory to use to store data
   * defaults to `/var/lib/seqgen/`  
 
